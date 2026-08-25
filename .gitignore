@@ -19,8 +19,6 @@ results/*.csv
 !models/.gitkeep
 
 # Internal assistant config (never publish)
-CLAUDE.md
-.claude/
 
 # IDE / OS
 .vscode/
