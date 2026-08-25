@@ -12,13 +12,15 @@ venv/
 data/*.csv
 data/*.parquet
 models/*.pt
-results/*.png
 results/*.csv
 
 # Keep directory structure
 !data/.gitkeep
 !models/.gitkeep
-!results/.gitkeep
+
+# Internal assistant config (never publish)
+CLAUDE.md
+.claude/
 
 # IDE / OS
 .vscode/

@@ -73,9 +73,13 @@ Chile no tienen.
 De una corrida real (semilla 42, 15.000 facturas, 750 anomalías
 inyectadas):
 
+<p align="center">
+  <img src="results/training_curve.png" width="48%" alt="Curva de entrenamiento">
+  <img src="results/reconstruction_error_hist.png" width="48%" alt="Distribucion del error de reconstruccion">
+</p>
+
 - El entrenamiento convergió sin problemas en 150 epochs (mejor epoch 146),
-  con pérdida de train/val muy cercana y sin overfitting (ver
-  `results/training_curve.png`).
+  con pérdida de train/val muy cercana y sin overfitting.
 - **Total: 280/750 anomalías inyectadas capturadas en el 5% superior por
   error de reconstrucción (37,3% de recall / 37,3% de precisión** —
   precisión y recall coinciden porque el conjunto marcado tiene exactamente
@@ -132,7 +136,7 @@ mining-procurement-anomaly-engine/
 ├── requirements.txt
 ├── data/                  # dataset generado (gitignored, se regenera al correr el script)
 ├── models/                # checkpoint del modelo entrenado (gitignored)
-└── results/               # CSV de anomalias + graficos (gitignored)
+└── results/               # CSV de anomalias (gitignored) + graficos versionados
 ```
 
 ## Cómo correrlo
@@ -143,8 +147,11 @@ py -3.10 -m venv venv
 .\venv\Scripts\python.exe autoencoder.py
 ```
 
-Los outputs quedan en `data/`, `models/` y `results/` — ver
-[CLAUDE.md](CLAUDE.md) para la lista completa de artefactos.
+Esto genera `data/procurement_invoices.csv` (dataset sintético completo),
+`models/autoencoder.pt` (pesos entrenados), y tres archivos en `results/`:
+`anomalias_detectadas.csv` (las facturas marcadas, ordenadas), más la curva
+de entrenamiento y el histograma de error de reconstrucción mostrados
+arriba.
 
 ## Licencia
 
