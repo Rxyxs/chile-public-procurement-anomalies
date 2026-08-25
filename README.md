@@ -1,0 +1,141 @@
+<h1 align="center">Mining Procurement Anomaly Engine</h1>
+
+<p align="center">
+  <a href="README.es.md">Español</a> · <b>English</b>
+</p>
+
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white">
+  <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.13%2Bcpu-EE4C2C?logo=pytorch&logoColor=white">
+  <img alt="Polars" src="https://img.shields.io/badge/Polars-1.44-CD792C?logo=polars&logoColor=white">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg">
+</p>
+
+An unsupervised anomaly-detection system for mining procurement invoices. A
+PyTorch autoencoder is trained on tabular invoice features and the 5% of
+invoices with the highest reconstruction error are isolated as candidates for
+manual audit — no labeled fraud data required.
+
+## Why this project
+
+Mining operations run large, recurring procurement spend across dozens of
+supplier categories (explosives, CAEX tires, crushing spares, fuel,
+maintenance services) at wildly different price scales. Manual invoice audit
+doesn't scale, and rule-based checks only catch the fraud patterns someone
+already thought to write a rule for. An unsupervised model that learns "what
+a normal invoice looks like" and flags whatever it can't reconstruct well
+gives an audit team a ranked worklist without needing historical fraud labels
+— which mining procurement departments in Chile generally don't have.
+
+## How it works
+
+```
+                    ┌─────────────────────────┐
+  synthetic          │   feature engineering   │        ┌──────────────┐        ┌────────────────┐
+  procurement   ───▶ │  category-relative       │  ───▶ │  PyTorch      │  ───▶ │  top 5% by       │
+  invoices           │  z-scores + monto/       │        │  autoencoder  │        │  reconstruction │
+  (Polars)           │  reconciliation ratio     │        │  (6→8→4→8→6)  │        │  error           │
+                    └─────────────────────────┘        └──────────────┘        └────────────────┘
+```
+
+1. **Synthetic data** (`generate_procurement_data`, Polars): 15,000 invoices
+   across 8 procurement categories, 6 mining regions, and 180 suppliers, with
+   category-specific log-normal price/quantity distributions. No public
+   dataset of Chilean mining procurement invoices exists, so the generator
+   models realistic category price scales (fuel ~$850 CLP/liter vs. CAEX
+   tires ~$8.5M CLP/unit) instead of fabricating arbitrary numbers.
+2. **Anomaly injection** (5% of rows): five distinct fraud patterns —
+   overpricing (3-8x), inflated quantity (5-10x), an invoice total that
+   doesn't reconcile with quantity × unit price (1.4-2.5x), a unit price
+   drawn from a mismatched category's distribution, and a brand-new supplier
+   billing an unusually high amount. The label is kept **only** to validate
+   the model afterward — it is never used during training.
+3. **Feature engineering**: raw price/quantity are log-normal and span
+   several orders of magnitude *between* categories, so they're expressed as
+   a z-score *relative to their own category* (fit on the train split only,
+   to avoid leakage) instead of raw values. A `monto_ratio_log` feature
+   directly exposes whether the declared total reconciles with quantity ×
+   unit price — this single engineered feature is what makes the
+   reconciliation-break and new-supplier fraud types detectable at all (see
+   Results).
+4. **Autoencoder** (PyTorch, CPU): 6 → 16 → 8 → 4 → 8 → 16 → 6, trained with
+   Adam + MSE loss and early stopping on a validation split.
+5. **Detection**: reconstruction error is computed for every invoice; the
+   95th-percentile threshold isolates the top 5% as anomalous.
+
+## Results
+
+From an actual run (seed 42, 15,000 invoices, 750 injected anomalies):
+
+- Training converged smoothly over 150 epochs (best epoch 146), train/val
+  loss tracking closely with no overfitting (see
+  `results/training_curve.png`).
+- **Overall: 280/750 injected anomalies captured in the top 5% by
+  reconstruction error (37.3% recall / 37.3% precision** — precision equals
+  recall here because the flagged set size is fixed at exactly 5% of the
+  data, same as the true anomaly rate).
+- That is ~7.5x better than the ~5% recall a random 5% sample would get by
+  chance.
+
+**Recall by injected anomaly type** (this breakdown is the honest part of
+the result — not all fraud patterns are equally separable at a fixed 5%
+budget):
+
+| Anomaly type | Recall | Detected / injected |
+|---|---|---|
+| Overpricing (3-8x) | 0.54 | 83/155 |
+| New supplier + inflated total | 0.51 | 77/152 |
+| Total doesn't reconcile with line items | 0.45 | 69/153 |
+| Category/price mismatch | 0.30 | 43/145 |
+| Inflated quantity (5-10x) | 0.06 | 8/145 |
+
+**Honest finding**: quantity inflation is structurally the hardest pattern
+to catch here. `cantidad_zscore_categoria`'s per-category standard deviation
+is estimated from an unsupervised training set that already contains ~1% of
+this exact fraud type — the estimate is contaminated by the very outliers
+it's meant to detect, which widens the "normal" range and dulls the signal.
+Switching to a robust median/MAD estimator fixes quantity inflation (recall
+0.06 → 0.17) but *lowers* overall recall (37.3% → 33.6%), because it
+re-shuffles which anomaly type wins the fixed top-5% budget — a real
+trade-off, not a bug, documented in `compute_category_stats()`'s docstring
+in [autoencoder.py](autoencoder.py). The mean/std version is kept as the
+default because it has the higher overall recall.
+
+Two real bugs were found and fixed while building this, both by running the
+pipeline and inspecting actual numbers rather than trusting the design:
+1. Feeding raw price/quantity/amount into the autoencoder gave only ~16%
+   recall — a global `StandardScaler` let the variance *between* categories
+   (order-of-magnitude price differences) drown out anomalies *within* a
+   category. Fixed with category-relative z-scores.
+2. A category/price-mismatch anomaly can produce a raw z-score of dozens of
+   standard deviations (a tire price evaluated against fuel's distribution),
+   and one supplier category (`Servicios Mantención`) has >50% of its
+   invoices at quantity=1, making its median-absolute-deviation exactly
+   zero — both produced instability/`NaN`s that needed winsorizing and a
+   MAD floor respectively.
+
+## Project structure
+
+```
+mining-procurement-anomaly-engine/
+├── autoencoder.py         # data generation, feature engineering, training, evaluation
+├── requirements.txt
+├── data/                  # generated dataset (gitignored, regenerated by running the script)
+├── models/                # trained model checkpoint (gitignored)
+└── results/               # anomalies CSV + plots (gitignored)
+```
+
+## Running it
+
+```powershell
+py -3.10 -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe autoencoder.py
+```
+
+Outputs land in `data/`, `models/`, and `results/` — see
+[CLAUDE.md](CLAUDE.md) for the full artifact list.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
