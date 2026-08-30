@@ -163,3 +163,7 @@ arriba.
 ## Licencia
 
 MIT — ver [LICENSE](LICENSE).
+
+## Autor
+
+**Pablo Reyes** — [github.com/Rxyxs](https://github.com/Rxyxs)

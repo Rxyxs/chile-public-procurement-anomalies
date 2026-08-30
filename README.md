@@ -152,3 +152,7 @@ curve and reconstruction-error histogram shown above.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Author
+
+**Pablo Reyes** — [github.com/Rxyxs](https://github.com/Rxyxs)
