@@ -30,15 +30,22 @@ de auditoría una lista priorizada sin necesitar historial de fraude
 etiquetado — algo que, en general, los departamentos de compras mineras en
 Chile no tienen.
 
+## Impacto de Negocio e Indicadores Clave (KPIs)
+
+| Métrica | Resultado | Qué significa |
+|---|---|---|
+| Recall total a presupuesto fijo de auditoría del 5% | 37,3% (280/750 anomalías inyectadas) | **~7,5x** mejor que el ~5% de recall que obtendría una muestra aleatoria del 5% por azar |
+| Tipo de fraude mejor detectado | Sobreprecio (3-8x), 0,54 de recall | La feature de reconciliación (`monto_ratio_log`) es lo que hace detectable este y otros patrones |
+| Tipo de fraude más difícil, reportado honestamente | Inflación de cantidad, 0,06 de recall | Causa raíz: la desviación estándar por categoría del propio set de entrenamiento está contaminada por el fraude que se supone debe detectar -- un trade-off documentado, no escondido |
+| Bug real corregido: escalado ciego a la categoría | ~16% de recall → 37,3% tras z-scores relativos a categoría | Un `StandardScaler` global dejaba que la varianza de precio entre categorías ahogara las anomalías dentro de cada categoría |
+
 ## Cómo funciona
 
-```
-                    ┌─────────────────────────┐
-  facturas de        │   ingenieria de features │        ┌──────────────┐        ┌────────────────┐
-  compra sinteticas ───▶ │  z-score relativo a la  │  ───▶ │  autoencoder  │  ───▶ │  top 5% por      │
-  (Polars)           │  categoria + razon de     │        │  PyTorch      │        │  error de        │
-                    │  reconciliacion de monto  │        │  (6→8→4→8→6)  │        │  reconstruccion │
-                    └─────────────────────────┘        └──────────────┘        └────────────────┘
+```mermaid
+flowchart LR
+    A[Facturas de compra sinteticas<br/>Polars, 15.000 filas] --> B["Ingenieria de features<br/>z-score relativo a categoria + monto_ratio_log"]
+    B --> C["Autoencoder PyTorch<br/>6 -> 16 -> 8 -> 4 -> 8 -> 16 -> 6"]
+    C --> D[Top 5% por error de reconstruccion<br/>marcado para auditoria manual]
 ```
 
 1. **Datos sintéticos** (`generate_procurement_data`, Polars): 15.000
