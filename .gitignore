@@ -13,6 +13,7 @@ data/*.csv
 data/*.parquet
 models/*.pt
 results/*.csv
+results/*.duckdb
 
 # Keep directory structure
 !data/.gitkeep

@@ -135,15 +135,65 @@ confiar en el diseño:
    ambos casos producían inestabilidad/`NaN` y se corrigieron con
    winsorizing y un piso mínimo de MAD, respectivamente.
 
+## Comparación de modelos: 3 enfoques complementarios
+
+`models_comparison.py` evalúa tres enfoques de detección complementarios
+sobre exactamente las mismas features/split que el autoencoder de arriba,
+más una comparación de funciones de activación del propio autoencoder
+(ReLU vs. GELU vs. Swish/SiLU, misma arquitectura y semilla para las tres).
+Los tres enfoques se evalúan igual: aislar el 5% con mayor score de
+anomalía y medir precision/recall contra las etiquetas inyectadas.
+
+| Enfoque | Precision @5% | Recall @5% | TP / inyectadas |
+|---|---|---|---|
+| Baseline (regla de z-score combinado, sin entrenamiento) | 0,539 | 0,539 | 404/750 |
+| Isolation Forest (300 árboles) | 0,531 | 0,531 | 398/750 |
+| Autoencoder — ReLU | 0,373 | 0,373 | 280/750 |
+| Autoencoder — GELU | 0,305 | 0,305 | 229/750 |
+| Autoencoder — Swish (SiLU) | 0,228 | 0,228 | 171/750 |
+
+<p align="center">
+  <img src="results/model_comparison.png" width="48%" alt="Comparacion de modelos">
+  <img src="results/activation_comparison.png" width="48%" alt="Comparacion de funciones de activacion">
+</p>
+
+**Hallazgo honesto**: en este dataset sintético en particular, tanto el
+baseline interpretable como Isolation Forest **superan** al autoencoder en
+recall. La regla de z-score suma directamente las tres señales
+manufacturadas (`precio_zscore_categoria`, `cantidad_zscore_categoria`,
+`monto_ratio_log`) que la inyección de fraude manipula, así que no tiene
+que aprender ninguna representación — es la señal misma. El autoencoder
+tiene que aprender esa representación solo a partir del error de
+reconstrucción, y lo paga en recall en un dataset de este tamaño (15.000
+filas, 6 features). Es una ilustración realista de por qué los baselines
+interpretables van en la comparación y no solo como formalidad: la
+complejidad extra del modelo no es gratis, y acá no se está pagando sola.
+Entre las tres activaciones, ReLU converge al mejor recall de detección
+pese a que GELU/Swish alcanzan un MSE de validación *más bajo* —
+activaciones más suaves reconstruyen mejor el grueso de facturas normales
+pero también reconstruyen parcialmente las anomalías, justo lo contrario
+de lo que necesita un umbral de top-5%-por-error.
+
+Las métricas y predicciones por factura de los cinco enfoques se persisten
+en `results/metrics.duckdb` (tablas `approach_metrics`, `predictions`) para
+poder consultarlas directamente con SQL, por ejemplo:
+
+```sql
+SELECT approach, precision, recall FROM approach_metrics ORDER BY recall DESC;
+```
+
 ## Estructura del proyecto
 
 ```
 mining-procurement-anomaly-engine/
-├── autoencoder.py         # generacion de datos, features, entrenamiento, evaluacion
+├── autoencoder.py          # generacion de datos, features, entrenamiento/evaluacion del autoencoder
+├── models_comparison.py    # regla baseline z-score + Isolation Forest + comparacion de activaciones, persistencia DuckDB
+├── tests/
+│   └── test_models_comparison.py  # tests unitarios pytest para los 3 enfoques
 ├── requirements.txt
 ├── data/                  # dataset generado (gitignored, se regenera al correr el script)
 ├── models/                # checkpoint del modelo entrenado (gitignored)
-└── results/               # CSV de anomalias (gitignored) + graficos versionados
+└── results/               # CSV de anomalias + metrics.duckdb (gitignored) + graficos versionados
 ```
 
 ## Cómo correrlo
@@ -152,13 +202,22 @@ mining-procurement-anomaly-engine/
 py -3.10 -m venv venv
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 .\venv\Scripts\python.exe autoencoder.py
+.\venv\Scripts\python.exe models_comparison.py
 ```
 
-Esto genera `data/procurement_invoices.csv` (dataset sintético completo),
-`models/autoencoder.pt` (pesos entrenados), y tres archivos en `results/`:
-`anomalias_detectadas.csv` (las facturas marcadas, ordenadas), más la curva
-de entrenamiento y el histograma de error de reconstrucción mostrados
-arriba.
+`autoencoder.py` genera `data/procurement_invoices.csv` (dataset sintético
+completo), `models/autoencoder.pt` (pesos entrenados), y tres archivos en
+`results/`: `anomalias_detectadas.csv` (las facturas marcadas, ordenadas),
+más la curva de entrenamiento y el histograma de error de reconstrucción
+mostrados arriba. `models_comparison.py` reutiliza ese mismo dataset (o lo
+regenera si no existe), y agrega `results/metrics.duckdb`,
+`results/model_comparison.png` y `results/activation_comparison.png`.
+
+### Tests
+
+```powershell
+.\venv\Scripts\python.exe -m pytest tests/ -v
+```
 
 ## Licencia
 
