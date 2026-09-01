@@ -27,6 +27,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numpy as np
 import polars as pl
 import torch
@@ -337,6 +338,53 @@ def train_autoencoder(
     return TrainResult(train_losses, val_losses, best_epoch)
 
 
+def save_training_curve_animation(
+    train_losses: list[float], val_losses: list[float], path: Path, n_frames: int = 40
+) -> None:
+    """Racing line-chart GIF of the (real, already-computed) train/val loss curves."""
+    n_epochs = len(train_losses)
+    n_frames = min(n_frames, n_epochs)
+    frame_epochs = sorted(set(np.linspace(1, n_epochs, n_frames, dtype=int)))
+
+    with plt.style.context("dark_background"):
+        fig, ax = plt.subplots(figsize=(12, 6))
+        (train_line,) = ax.plot([], [], color="#4C72B0", lw=2, label="Train loss")
+        (val_line,) = ax.plot([], [], color="#DD8452", lw=2, label="Val loss")
+        train_label = ax.annotate(
+            "", xy=(0, 0), xytext=(10, 10), textcoords="offset points",
+            color="white", fontsize=9,
+            bbox=dict(boxstyle="round,pad=0.3", fc="#4C72B0", ec="none", alpha=0.9),
+        )
+        val_label = ax.annotate(
+            "", xy=(0, 0), xytext=(10, -20), textcoords="offset points",
+            color="white", fontsize=9,
+            bbox=dict(boxstyle="round,pad=0.3", fc="#DD8452", ec="none", alpha=0.9),
+        )
+        ax.set_xlim(0, n_epochs)
+        y_max = max(max(train_losses), max(val_losses)) * 1.1
+        ax.set_ylim(0, y_max)
+        ax.set_xlabel("Epoch")
+        ax.set_ylabel("MSE")
+        ax.set_title("Curva de entrenamiento del autoencoder (animada)")
+        ax.legend(loc="upper right")
+        fig.tight_layout()
+
+        def update(frame_idx: int):
+            epoch = frame_epochs[frame_idx]
+            x = list(range(1, epoch + 1))
+            train_line.set_data(x, train_losses[:epoch])
+            val_line.set_data(x, val_losses[:epoch])
+            train_label.xy = (epoch, train_losses[epoch - 1])
+            train_label.set_text(f"Train loss: {train_losses[epoch - 1]:.4f}")
+            val_label.xy = (epoch, val_losses[epoch - 1])
+            val_label.set_text(f"Val loss: {val_losses[epoch - 1]:.4f}")
+            return train_line, val_line, train_label, val_label
+
+        ani = FuncAnimation(fig, update, frames=len(frame_epochs), interval=150, blit=False)
+        ani.save(path, writer="pillow")
+        plt.close(fig)
+
+
 def reconstruction_error(model: nn.Module, X: np.ndarray, device: torch.device) -> np.ndarray:
     model.eval()
     with torch.no_grad():
@@ -442,6 +490,10 @@ def main() -> None:
     fig.tight_layout()
     fig.savefig(RESULTS_DIR / "training_curve.png", dpi=150)
     plt.close(fig)
+
+    save_training_curve_animation(
+        result.train_losses, result.val_losses, RESULTS_DIR / "training_curve_animated.gif"
+    )
 
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.hist(errors, bins=80, color="#4C72B0", alpha=0.8)

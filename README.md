@@ -74,8 +74,14 @@ flowchart LR
 
 From an actual run (seed 42, 15,000 invoices, 750 injected anomalies):
 
+The animated version below traces the same train/val loss curves epoch by epoch, with a live-updating label at the advancing tip of each line.
+
 <p align="center">
+  <img src="results/training_curve_animated.gif" width="48%" alt="Training curve animated">
   <img src="results/training_curve.png" width="48%" alt="Training curve">
+</p>
+
+<p align="center">
   <img src="results/reconstruction_error_hist.png" width="48%" alt="Reconstruction error distribution">
 </p>
 
@@ -142,8 +148,14 @@ precision/recall against the injected labels.
 | Autoencoder — GELU | 0.305 | 0.305 | 229/750 |
 | Autoencoder — Swish (SiLU) | 0.228 | 0.228 | 171/750 |
 
+The animated version below races the val-loss curve of each activation function epoch by epoch, with a live-updating label per line.
+
 <p align="center">
   <img src="results/model_comparison.png" width="48%" alt="Model comparison">
+  <img src="results/activation_comparison_animated.gif" width="48%" alt="Activation function comparison animated">
+</p>
+
+<p align="center">
   <img src="results/activation_comparison.png" width="48%" alt="Activation function comparison">
 </p>
 

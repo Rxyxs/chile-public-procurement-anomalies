@@ -80,8 +80,14 @@ flowchart LR
 De una corrida real (semilla 42, 15.000 facturas, 750 anomalías
 inyectadas):
 
+La versión animada de abajo traza las mismas curvas de pérdida train/val epoch a epoch, con una etiqueta que se actualiza en la punta de cada línea.
+
 <p align="center">
+  <img src="results/training_curve_animated.gif" width="48%" alt="Curva de entrenamiento animada">
   <img src="results/training_curve.png" width="48%" alt="Curva de entrenamiento">
+</p>
+
+<p align="center">
   <img src="results/reconstruction_error_hist.png" width="48%" alt="Distribucion del error de reconstruccion">
 </p>
 
@@ -152,8 +158,14 @@ anomalía y medir precision/recall contra las etiquetas inyectadas.
 | Autoencoder — GELU | 0,305 | 0,305 | 229/750 |
 | Autoencoder — Swish (SiLU) | 0,228 | 0,228 | 171/750 |
 
+La versión animada de abajo corre la curva de val loss de cada función de activación epoch a epoch, con una etiqueta que se actualiza por línea.
+
 <p align="center">
   <img src="results/model_comparison.png" width="48%" alt="Comparacion de modelos">
+  <img src="results/activation_comparison_animated.gif" width="48%" alt="Comparacion de funciones de activacion animada">
+</p>
+
+<p align="center">
   <img src="results/activation_comparison.png" width="48%" alt="Comparacion de funciones de activacion">
 </p>
 

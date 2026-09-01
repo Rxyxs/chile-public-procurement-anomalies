@@ -31,6 +31,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numpy as np
 import polars as pl
 import torch
@@ -222,6 +223,55 @@ def plot_model_comparison(results: list[ApproachResult], path: Path) -> None:
     plt.close(fig)
 
 
+def save_activation_comparison_animation(
+    activation_results: dict[str, tuple[np.ndarray, list[float], list[float]]],
+    path: Path,
+    n_frames: int = 40,
+) -> None:
+    """Racing line-chart GIF of the (real, already-computed) val-loss-per-activation curves."""
+    colors = {"ReLU": "#4C72B0", "GELU": "#55A868", "Swish (SiLU)": "#C44E52"}
+    series = {name: val_losses for name, (_errors, _train, val_losses) in activation_results.items()}
+    n_epochs = max(len(v) for v in series.values())
+    n_frames = min(n_frames, n_epochs)
+    frame_epochs = sorted(set(np.linspace(1, n_epochs, n_frames, dtype=int)))
+
+    with plt.style.context("dark_background"):
+        fig, ax = plt.subplots(figsize=(12, 6))
+        lines: dict[str, plt.Line2D] = {}
+        labels: dict[str, "plt.Annotation"] = {}
+        for i, (name, val_losses) in enumerate(series.items()):
+            (line,) = ax.plot([], [], color=colors.get(name), lw=2, label=name)
+            lines[name] = line
+            labels[name] = ax.annotate(
+                "", xy=(0, 0), xytext=(10, 10 - 25 * i), textcoords="offset points",
+                color="white", fontsize=9,
+                bbox=dict(boxstyle="round,pad=0.3", fc=colors.get(name, "gray"), ec="none", alpha=0.9),
+            )
+        ax.set_xlim(0, n_epochs)
+        ax.set_ylim(0, max(max(v) for v in series.values()) * 1.1)
+        ax.set_xlabel("Epoch")
+        ax.set_ylabel("Val loss (MSE)")
+        ax.set_title("Curva de validacion por funcion de activacion (animada)")
+        ax.legend(loc="upper right")
+        fig.tight_layout()
+
+        def update(frame_idx: int):
+            epoch = frame_epochs[frame_idx]
+            artists = []
+            for name, val_losses in series.items():
+                e = min(epoch, len(val_losses))
+                x = list(range(1, e + 1))
+                lines[name].set_data(x, val_losses[:e])
+                labels[name].xy = (e, val_losses[e - 1])
+                labels[name].set_text(f"{name}: {val_losses[e - 1]:.4f}")
+                artists += [lines[name], labels[name]]
+            return artists
+
+        ani = FuncAnimation(fig, update, frames=len(frame_epochs), interval=150, blit=False)
+        ani.save(path, writer="pillow")
+        plt.close(fig)
+
+
 def plot_activation_comparison(
     activation_results: dict[str, tuple[np.ndarray, list[float], list[float]]], path: Path
 ) -> None:
@@ -332,6 +382,7 @@ def main() -> None:
 
     plot_model_comparison(results, RESULTS_DIR / "model_comparison.png")
     plot_activation_comparison(activation_results, RESULTS_DIR / "activation_comparison.png")
+    save_activation_comparison_animation(activation_results, RESULTS_DIR / "activation_comparison_animated.gif")
     print(f"\nGraficos guardados en {RESULTS_DIR}")
 
     print("\nResumen final (para README):")
