@@ -19,8 +19,6 @@ results/*.duckdb
 !data/.gitkeep
 !models/.gitkeep
 
-# Internal assistant config (never publish)
-
 # IDE / OS
 .vscode/
 .idea/
