@@ -2,7 +2,7 @@
 
 # Public Procurement Anomaly Engine (Chile)
 
-[![CI](https://github.com/Rxyxs/mining-procurement-anomaly-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Rxyxs/mining-procurement-anomaly-engine/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue) ![Data](https://img.shields.io/badge/data-real%20(ChileCompra)-2ea44f) ![License](https://img.shields.io/badge/license-MIT-green)
+[![CI](https://github.com/Rxyxs/chile-public-procurement-anomalies/actions/workflows/ci.yml/badge.svg)](https://github.com/Rxyxs/chile-public-procurement-anomalies/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue) ![Data](https://img.shields.io/badge/data-real%20(ChileCompra)-2ea44f) ![License](https://img.shields.io/badge/license-MIT-green)
 
 On 13.7 million real purchase-order lines from Mercado Público, Compra Ágil orders pile up just under the legal cap, twice the trend under the old 30 UTM cap and 71% above it under the new 100 UTM one, and the pile moved when Ley 21.634 moved the cap; but within the same buyer, orders at the cap come with a same-supplier order within a week only 2 points more often, so most of the pile looks like purchases sized to the limit rather than split under it.
 
@@ -98,7 +98,7 @@ The two changes that made the detectors usable on real data were robust statisti
 
 ## What changed from the first version
 
-The first version detected anomalies in 15,000 simulated invoices of a mining company, with anomalies injected by the same code that generated the data. It now runs on every public purchase order in Chile. The detectors are still there, scored the same way but on a real background, and the two new analyses (the cap and split purchases) answer questions that only real data can raise. The repository keeps its name; its subject is no longer mining procurement.
+The first version detected anomalies in 15,000 simulated invoices of a mining company, with anomalies injected by the same code that generated the data. It now runs on every public purchase order in Chile. The detectors are still there, scored the same way but on a real background, and the two new analyses (the cap and split purchases) answer questions that only real data can raise. The repository was renamed from `mining-procurement-anomaly-engine` to match; old links to it on GitHub redirect here.
 
 ## Technology stack
 

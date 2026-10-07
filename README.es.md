@@ -2,7 +2,7 @@
 
 # Public Procurement Anomaly Engine (Chile)
 
-[![CI](https://github.com/Rxyxs/mining-procurement-anomaly-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Rxyxs/mining-procurement-anomaly-engine/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue) ![Datos](https://img.shields.io/badge/datos-reales%20(ChileCompra)-2ea44f) ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
+[![CI](https://github.com/Rxyxs/chile-public-procurement-anomalies/actions/workflows/ci.yml/badge.svg)](https://github.com/Rxyxs/chile-public-procurement-anomalies/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue) ![Datos](https://img.shields.io/badge/datos-reales%20(ChileCompra)-2ea44f) ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
 
 En 13,7 millones de líneas reales de órdenes de compra de Mercado Público, las Compras Ágiles se acumulan justo bajo el tope legal, el doble de la tendencia con el tope antiguo de 30 UTM y 71% más con el nuevo de 100 UTM, y la acumulación se movió cuando la Ley 21.634 movió el tope; pero dentro de un mismo comprador, las órdenes pegadas al tope vienen con otra orden al mismo proveedor en la semana solo 2 puntos más seguido, así que la mayor parte de la acumulación parece compras ajustadas al límite y no compras partidas para quedar bajo él.
 
@@ -98,7 +98,7 @@ Los dos cambios que hicieron usables los detectores con datos reales fueron las 
 
 ## Qué cambió respecto de la primera versión
 
-La primera versión detectaba anomalías en 15.000 facturas simuladas de una minera, con anomalías inyectadas por el mismo código que generaba los datos. Ahora corre sobre todas las órdenes de compra públicas de Chile. Los detectores siguen, evaluados de la misma forma pero sobre un fondo real, y los dos análisis nuevos (el tope y las compras partidas) responden preguntas que solo los datos reales permiten hacer. El repositorio mantiene su nombre; su tema ya no son las compras mineras.
+La primera versión detectaba anomalías en 15.000 facturas simuladas de una minera, con anomalías inyectadas por el mismo código que generaba los datos. Ahora corre sobre todas las órdenes de compra públicas de Chile. Los detectores siguen, evaluados de la misma forma pero sobre un fondo real, y los dos análisis nuevos (el tope y las compras partidas) responden preguntas que solo los datos reales permiten hacer. Por eso el repositorio cambió su nombre `mining-procurement-anomaly-engine` por el actual; los enlaces antiguos en GitHub redirigen acá.
 
 ## Stack tecnológico
 
