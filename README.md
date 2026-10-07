@@ -1,224 +1,131 @@
-<h1 align="center">Mining Procurement Anomaly Engine</h1>
+**[English](README.md) | [Español](README.es.md)**
 
-<p align="center">
-  <a href="README.es.md">Español</a> · <b>English</b>
-</p>
+# Public Procurement Anomaly Engine (Chile)
 
-<p align="center">
-  <img alt="Python" src="https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white">
-  <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.13%2Bcpu-EE4C2C?logo=pytorch&logoColor=white">
-  <img alt="Polars" src="https://img.shields.io/badge/Polars-1.44-CD792C?logo=polars&logoColor=white">
-  <img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg">
-</p>
+[![CI](https://github.com/Rxyxs/mining-procurement-anomaly-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Rxyxs/mining-procurement-anomaly-engine/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue) ![Data](https://img.shields.io/badge/data-real%20(ChileCompra)-2ea44f) ![License](https://img.shields.io/badge/license-MIT-green)
 
-An unsupervised anomaly-detection system for mining procurement invoices. A
-PyTorch autoencoder is trained on tabular invoice features and the 5% of
-invoices with the highest reconstruction error are isolated as candidates for
-manual audit — no labeled fraud data required.
+On 13.7 million real purchase-order lines from Mercado Público, Compra Ágil orders pile up just under the legal cap, twice the trend under the old 30 UTM cap and 71% above it under the new 100 UTM one, and the pile moved when Ley 21.634 moved the cap; but within the same buyer, orders at the cap come with a same-supplier order within a week only 2 points more often, so most of the pile looks like purchases sized to the limit rather than split under it.
 
-## Why this project
+## What I found
 
-Mining operations run large, recurring procurement spend across dozens of
-supplier categories (explosives, CAEX tires, crushing spares, fuel,
-maintenance services) at wildly different price scales. Manual invoice audit
-doesn't scale, and rule-based checks only catch the fraud patterns someone
-already thought to write a rule for. An unsupervised model that learns "what
-a normal invoice looks like" and flags whatever it can't reconstruct well
-gives an audit team a ranked worklist without needing historical fraud labels
-— which mining procurement departments in Chile generally don't have.
+| Finding | Evidence |
+|---|---|
+| **The pile follows the cap** | Under the 30 UTM cap (January-November 2024) the last 10% below it holds 103% more Compra Ágil orders than the trend predicts (95% interval 100% to 107%), about 34,200 extra orders. Under the 100 UTM cap (January 2025-September 2026) it holds 71% more (68% to 75%), about 18,300. At 30 UTM in 2025-26, once it was no longer a cap, the excess drops to 18%, in line with six amounts that were never caps (-6% to +30%). |
+| **Splitting is a weak signal, not the main story** | Orders at 95-100% of the cap have another order of the same buyer and supplier within 7 days more often than orders at 60-90% (43% against 32% in 2024). Comparing orders of the same buyer, the gap shrinks to 2.6 points (1.7 to 3.6) in 2024 and 1.7 points (0.6 to 2.8) in 2025-26; same-day pairs are not significant after the change (p = 0.53). |
+| **There is still a worklist for an auditor** | Since 2025, 20,020 chains of orders from one buyer to one supplier, each under the cap but adding up to more than 100 UTM within a week of each other, hold 15.7% of all the Compra Ágil amount. Not proof of anything, but where a review should start. |
+| **On real lines, Isolation Forest is the detector to use** | Reviewing the top 5% of 200,000 real 2026 lines with 10,000 planted anomalies, Isolation Forest finds 38.8% of them (7.8 times a random review), the autoencoder 22.4% to 22.9% depending on the activation, and the z-score rule 17.4%. On the simulated invoices of the first version the rule won; real data reversed the ranking. |
+| **Overpricing hides in the noise** | A price 3 to 8 times too high is found in at most 10.6% of the cases by any detector: the ONU product codes are broad ("medical exams", "stationery"), so real prices already vary that much. A thousandfold typo is found 70.2% of the time, and so is a high bill from a supplier with no history. |
 
-## Business Impact & Key Performance Indicators
+## The data
 
-| Metric | Result | What it means |
+Every purchase order sent through [Mercado Público](https://www.mercadopublico.cl) is published as open data by ChileCompra, one ZIP per month with one row per order line. The pipeline downloads 32 months (`python main.py --download`): January to November 2024, when the Compra Ágil cap was 30 UTM, and January 2025 to September 2026, after [Ley 21.634](https://www.chilecompra.cl/ley-de-compras-publicas/) raised it to 100 UTM on 12 December 2024. December 2024 mixes both rules and is left out.
+
+| | |
+|---|---:|
+| Order lines | 13,742,385 |
+| Purchase orders | 5,006,455 |
+| Buying units | 6,217 |
+| Suppliers | 122,356 |
+| Compra Ágil orders, 2024 (cap 30 UTM) | 686,395 |
+| Compra Ágil orders, 2025-26 (cap 100 UTM) | 1,278,781 |
+
+Things in the files that had to be handled before any analysis:
+
+- **Two encodings in the same file.** The CSVs are Windows-1252, except for fields that arrive in UTF-8 (1,828 sequences in January 2025 alone, such as "ISOFÁNICA"). Reading the whole file as either one corrupts the other; every byte sequence that is valid UTF-8 is read as UTF-8 and the rest as Windows-1252.
+- **The cap that applies is the one in force when the order was created**, not when it was sent: orders created under the old rule keep appearing in 2025 files. Amounts are converted with the UTM of the creation month.
+- **The cap binds on the total including taxes.** No Compra Ágil order goes above 100 UTM gross, while net amounts stop near 84 UTM (100 / 1.19). The 26 and 12 orders above the cap in each period, and five orders above one trillion pesos, are data-entry errors.
+- **Totals are computed by the platform**: only 0.06% of lines have a total that does not match quantity times price, so the "total that does not reconcile" anomaly of the first, simulated version does not exist in real data.
+- **Buyers and suppliers are kept as codes.** No name of any buyer or supplier appears in the results: everything published here is aggregated.
+
+## 1. The pile under the cap
+
+![Compra Ágil orders by amount](results/figures/bunching_compra_agil.png)
+
+Compra Ágil orders by total amount: under either rule, the density is flat between 60% and 90% of the cap and climbs sharply in the last 10% below it, which is where the excess is measured against a straight line fitted on the flat part.
+
+![Excess mass at real and fake caps](results/figures/placebo_caps.png)
+
+The same measure at amounts that never were a cap stays between -6% and +30%; under the real caps it is 103% and 71%, and at 30 UTM it fell to 18% as soon as the cap moved away from it.
+
+| Where the excess is measured | Excess mass | 95% interval | Extra orders |
+|---|---:|---:|---:|
+| 30 UTM, 2024 (cap) | 103.0% | 99.5% to 107.1% | 34,223 |
+| 100 UTM, 2025-26 (cap) | 71.5% | 68.0% to 75.2% | 18,319 |
+| 30 UTM, 2025-26 (no longer a cap) | 18.1% | 15.5% to 20.6% | |
+
+How sure is the size: the excess depends on the counterfactual. With a constant or a straight line, three fit ranges and three window widths (18 specifications), it goes from 52% to 139% under the 30 UTM cap and from 26% to 138% under the 100 UTM one. The direction is never in doubt; the exact percentage is. A fifth-degree polynomial, the textbook choice, swung from +65% to -747% with the degree and is not used.
+
+## 2. Split purchases or purchases sized to the cap?
+
+A pile under a cap fits two behaviours the histogram cannot separate: a buyer sizing a purchase to the maximum allowed, which is legal, and one purchase split in two to stay under it, which the law forbids. Splitting leaves a trace: another order of the same buyer to the same supplier a few days apart.
+
+![Orders with a sibling by size](results/figures/sibling_rates.png)
+
+The share of orders with a same-buyer, same-supplier order within 7 days rises near the cap under both rules, from about 21% to 34% after the change.
+
+But buyers that buy near the cap are also buyers that repeat purchases often. Comparing orders *of the same buying unit* (a linear probability model with buyer fixed effects, errors clustered by buyer), most of the gap disappears:
+
+| Period | With a sibling: at 95-100% of the cap | At 60-90% | Within the same buyer | 95% interval | Same-day sibling, within buyer |
+|---|---:|---:|---:|---:|---:|
+| 2024 (cap 30 UTM) | 42.8% | 31.9% | +2.6 points | +1.7 to +3.6 | +1.1 points (p = 0.025) |
+| 2025-26 (cap 100 UTM) | 34.8% | 28.7% | +1.7 points | +0.6 to +2.8 | +0.3 points (p = 0.53) |
+
+So the pile is mostly purchases sized to the limit. Splitting does appear in the data, as a gap of one or two points, not as the explanation of the pile. What an auditor can still use: since 2025, **20,020 chains** of orders from one buyer to one supplier, each under the cap and each within 7 days of the previous one, add up to more than 100 UTM. They are 7.0% of the Compra Ágil orders and 15.7% of the amount; in 2024 they were 16.0% of the orders and 24.5% of the amount. Recurring legitimate purchases (food, supplies) look the same, so these are a ranking for review, not findings.
+
+## 3. Detectors on real order lines
+
+Real orders have no labels, so the three detectors of the first version are compared on a real background. They are trained on 400,000 lines from 2025; then 10,000 anomalies of five kinds (2,000 each) are planted in 200,000 real lines from 2026, and each detector ranks all of them. The score is the share of planted lines in its top 5%, what a team reviewing one line in twenty would catch. Real anomalies already in the data count against the detectors, as they would in a real review.
+
+The features compare each line with what its product usually costs. Product means ONU code and unit of measure, with median and MAD from 2025 (12,453 groups covering 92% of the 2026 lines): price, quantity and total as robust z-scores, the distance to what *the same buyer* paid before for the same product, the supplier's age in the data and the buyer-supplier history.
+
+![Planted anomalies found by each detector](results/figures/detector_recall.png)
+
+| Detector | All | Overpricing ×3-8 | Quantity ×5-10 | Thousandfold typo | New supplier, high bill | Price of another product |
+|---|---:|---:|---:|---:|---:|---:|
+| Isolation Forest | 38.8% | 7.0% | 12.0% | 70.2% | 70.0% | 34.9% |
+| Autoencoder (GELU) | 22.9% | 9.9% | 11.6% | 51.6% | 15.2% | 26.2% |
+| Autoencoder (ReLU) | 22.4% | 10.1% | 14.5% | 46.2% | 16.7% | 24.6% |
+| Autoencoder (Swish (SiLU)) | 22.4% | 10.6% | 12.3% | 45.2% | 16.0% | 27.8% |
+| Rule (z-scores) | 17.4% | 5.9% | 23.5% | 38.6% | 4.5% | 14.5% |
+
+A random review of 5% finds 5%. Isolation Forest wins because it uses the supplier's history, where planted new suppliers stand out, and because extreme combinations isolate quickly in a tree. The rule only looks at prices and quantities and is best at inflated quantities. The autoencoder sits in between with any activation; its best epoch was 148 of 150, so it was still improving slowly.
+
+![Autoencoder training curves](results/figures/training_curves.png)
+
+Reconstruction error on 2025 lines for the three activations; the validation curve tracks the training one, without overfitting.
+
+The two changes that made the detectors usable on real data were robust statistics (median and MAD, because real prices have heavy tails and a mean and standard deviation are dragged by the outliers the detectors look for) and the comparison with the same buyer's past prices: without it, during development, Isolation Forest found about a third as many planted anomalies and missed most typos.
+
+## What changed from the first version
+
+The first version detected anomalies in 15,000 simulated invoices of a mining company, with anomalies injected by the same code that generated the data. It now runs on every public purchase order in Chile. The detectors are still there, scored the same way but on a real background, and the two new analyses (the cap and split purchases) answer questions that only real data can raise. The repository keeps its name; its subject is no longer mining procurement.
+
+## Technology stack
+
+| Layer | Technology | Role |
 |---|---|---|
-| Overall recall at a fixed 5% audit budget | 37.3% (280/750 injected anomalies) | **~7.5x** better than the ~5% recall a random 5% sample would get by chance |
-| Best-detected fraud type | Overpricing (3-8x), 0.54 recall | The reconciliation feature (`monto_ratio_log`) is what makes this and other patterns detectable at all |
-| Hardest fraud type, honestly reported | Quantity inflation, 0.06 recall | Root-caused to the training set's own per-category std being contaminated by the fraud it's meant to detect -- a documented trade-off, not hidden |
-| Real bug fixed: category-blind scaling | ~16% recall → 37.3% after category-relative z-scores | Global `StandardScaler` let between-category price variance drown out within-category anomalies |
+| Data | **urllib**, **Polars**, **Parquet** | Download, mixed-encoding parsing, 13.7 M lines in 313 MB |
+| Statistics | **NumPy**, **statsmodels** | Bunching estimator, fixed-effects models with clustered errors |
+| Detection | **scikit-learn** (Isolation Forest), **PyTorch** (autoencoder) | Unsupervised detectors and the activation comparison |
 
-## How it works
-
-```mermaid
-flowchart LR
-    A[Synthetic procurement invoices<br/>Polars, 15,000 rows] --> B["Feature engineering<br/>category-relative z-scores + monto_ratio_log"]
-    B --> C["PyTorch autoencoder<br/>6 -> 16 -> 8 -> 4 -> 8 -> 16 -> 6"]
-    C --> D[Top 5% by reconstruction error<br/>flagged for manual audit]
-```
-
-1. **Synthetic data** (`generate_procurement_data`, Polars): 15,000 invoices
-   across 8 procurement categories, 6 mining regions, and 180 suppliers, with
-   category-specific log-normal price/quantity distributions. No public
-   dataset of Chilean mining procurement invoices exists, so the generator
-   models realistic category price scales (fuel ~$850 CLP/liter vs. CAEX
-   tires ~$8.5M CLP/unit) instead of fabricating arbitrary numbers.
-2. **Anomaly injection** (5% of rows): five distinct fraud patterns —
-   overpricing (3-8x), inflated quantity (5-10x), an invoice total that
-   doesn't reconcile with quantity × unit price (1.4-2.5x), a unit price
-   drawn from a mismatched category's distribution, and a brand-new supplier
-   billing an unusually high amount. The label is kept **only** to validate
-   the model afterward — it is never used during training.
-3. **Feature engineering**: raw price/quantity are log-normal and span
-   several orders of magnitude *between* categories, so they're expressed as
-   a z-score *relative to their own category* (fit on the train split only,
-   to avoid leakage) instead of raw values. A `monto_ratio_log` feature
-   directly exposes whether the declared total reconciles with quantity ×
-   unit price — this single engineered feature is what makes the
-   reconciliation-break and new-supplier fraud types detectable at all (see
-   Results).
-4. **Autoencoder** (PyTorch, CPU): 6 → 16 → 8 → 4 → 8 → 16 → 6, trained with
-   Adam + MSE loss and early stopping on a validation split.
-5. **Detection**: reconstruction error is computed for every invoice; the
-   95th-percentile threshold isolates the top 5% as anomalous.
-
-## Results
-
-From an actual run (seed 42, 15,000 invoices, 750 injected anomalies):
-
-The animated version below traces the same train/val loss curves epoch by epoch, with a live-updating label at the advancing tip of each line.
-
-<p align="center">
-  <img src="results/training_curve_animated.gif" width="48%" alt="Training curve animated">
-  <img src="results/training_curve.png" width="48%" alt="Training curve">
-</p>
-
-<p align="center">
-  <img src="results/reconstruction_error_hist.png" width="48%" alt="Reconstruction error distribution">
-</p>
-
-- Training converged smoothly over 150 epochs (best epoch 146), train/val
-  loss tracking closely with no overfitting.
-- **Overall: 280/750 injected anomalies captured in the top 5% by
-  reconstruction error (37.3% recall / 37.3% precision** — precision equals
-  recall here because the flagged set size is fixed at exactly 5% of the
-  data, same as the true anomaly rate).
-- That is ~7.5x better than the ~5% recall a random 5% sample would get by
-  chance.
-
-**Recall by injected anomaly type** (this breakdown is the honest part of
-the result — not all fraud patterns are equally separable at a fixed 5%
-budget):
-
-| Anomaly type | Recall | Detected / injected |
-|---|---|---|
-| Overpricing (3-8x) | 0.54 | 83/155 |
-| New supplier + inflated total | 0.51 | 77/152 |
-| Total doesn't reconcile with line items | 0.45 | 69/153 |
-| Category/price mismatch | 0.30 | 43/145 |
-| Inflated quantity (5-10x) | 0.06 | 8/145 |
-
-**Honest finding**: quantity inflation is structurally the hardest pattern
-to catch here. `cantidad_zscore_categoria`'s per-category standard deviation
-is estimated from an unsupervised training set that already contains ~1% of
-this exact fraud type — the estimate is contaminated by the very outliers
-it's meant to detect, which widens the "normal" range and dulls the signal.
-Switching to a robust median/MAD estimator fixes quantity inflation (recall
-0.06 → 0.17) but *lowers* overall recall (37.3% → 33.6%), because it
-re-shuffles which anomaly type wins the fixed top-5% budget — a real
-trade-off, not a bug, documented in `compute_category_stats()`'s docstring
-in [autoencoder.py](autoencoder.py). The mean/std version is kept as the
-default because it has the higher overall recall.
-
-Two real bugs were found and fixed while building this, both by running the
-pipeline and inspecting actual numbers rather than trusting the design:
-1. Feeding raw price/quantity/amount into the autoencoder gave only ~16%
-   recall — a global `StandardScaler` let the variance *between* categories
-   (order-of-magnitude price differences) drown out anomalies *within* a
-   category. Fixed with category-relative z-scores.
-2. A category/price-mismatch anomaly can produce a raw z-score of dozens of
-   standard deviations (a tire price evaluated against fuel's distribution),
-   and one supplier category (`Servicios Mantención`) has >50% of its
-   invoices at quantity=1, making its median-absolute-deviation exactly
-   zero — both produced instability/`NaN`s that needed winsorizing and a
-   MAD floor respectively.
-
-## Model comparison: 3 complementary approaches
-
-`models_comparison.py` evaluates three complementary detection approaches
-on the exact same features/split as the autoencoder above, plus an
-activation-function ablation of the autoencoder itself (ReLU vs. GELU vs.
-Swish/SiLU, same architecture and seed for all three). All approaches are
-scored the same way: isolate the top 5% by anomaly score and measure
-precision/recall against the injected labels.
-
-| Approach | Precision @5% | Recall @5% | TP / injected |
-|---|---|---|---|
-| Baseline (combined z-score rule, no training) | 0.539 | 0.539 | 404/750 |
-| Isolation Forest (300 trees) | 0.531 | 0.531 | 398/750 |
-| Autoencoder — ReLU | 0.373 | 0.373 | 280/750 |
-| Autoencoder — GELU | 0.305 | 0.305 | 229/750 |
-| Autoencoder — Swish (SiLU) | 0.228 | 0.228 | 171/750 |
-
-The animated version below races the val-loss curve of each activation function epoch by epoch, with a live-updating label per line.
-
-<p align="center">
-  <img src="results/model_comparison.png" width="48%" alt="Model comparison">
-  <img src="results/activation_comparison_animated.gif" width="48%" alt="Activation function comparison animated">
-</p>
-
-<p align="center">
-  <img src="results/activation_comparison.png" width="48%" alt="Activation function comparison">
-</p>
-
-**Honest finding**: on this particular synthetic dataset, the simple
-interpretable baseline and Isolation Forest *both beat* the autoencoder on
-recall. The z-score rule directly sums the same three engineered signals
-(`precio_zscore_categoria`, `cantidad_zscore_categoria`,
-`monto_ratio_log`) the fraud injection manipulates, so it has no
-representation to learn — it's the signal. The autoencoder has to learn
-that representation from reconstruction error alone, and pays for it in
-recall on a dataset this size (15,000 rows, 6 features). This is a
-realistic illustration of why interpretable baselines belong in the
-comparison and not just as a formality: added model complexity isn't free,
-and here it isn't paying for itself. Among the three activations, ReLU
-converges to the best detection recall despite GELU/Swish reaching a
-*lower* validation MSE — smoother activations reconstruct the bulk of
-normal invoices better but also partially reconstruct the anomalies,
-which is exactly the opposite of what the top-5%-by-error threshold needs.
-
-Metrics and per-invoice predictions for all five approaches are persisted
-to `results/metrics.duckdb` (tables `approach_metrics`, `predictions`) so
-they can be queried directly with SQL, e.g.:
-
-```sql
-SELECT approach, precision, recall FROM approach_metrics ORDER BY recall DESC;
-```
-
-## Project structure
-
-```
-mining-procurement-anomaly-engine/
-├── autoencoder.py          # data generation, feature engineering, autoencoder training/evaluation
-├── models_comparison.py    # baseline z-score rule + Isolation Forest + activation comparison, DuckDB persistence
-├── tests/
-│   └── test_models_comparison.py  # pytest unit tests for all 3 approaches
-├── requirements.txt
-├── data/                  # generated dataset (gitignored, regenerated by running the script)
-├── models/                # trained model checkpoint (gitignored)
-└── results/               # anomalies CSV + metrics.duckdb (gitignored) + committed plots
-```
-
-## Running it
+## Getting started
 
 ```powershell
-py -3.10 -m venv venv
-.\venv\Scripts\python.exe -m pip install -r requirements.txt
-.\venv\Scripts\python.exe autoencoder.py
-.\venv\Scripts\python.exe models_comparison.py
+py -m venv venv
+./venv/Scripts/pip install -r requirements.txt
+./venv/Scripts/python main.py --download   # once: 32 monthly ZIPs (~3 GB, about 10 minutes) and the UTM
+./venv/Scripts/python main.py              # about 20 minutes on a laptop CPU
 ```
 
-`autoencoder.py` writes `data/procurement_invoices.csv` (full synthetic
-dataset), `models/autoencoder.pt` (trained weights), and three files in
-`results/`: `anomalias_detectadas.csv` (the flagged invoices, ranked), plus
-the training curve and reconstruction-error histogram shown above.
-`models_comparison.py` reuses that same dataset (or regenerates it if
-missing), adds `results/metrics.duckdb`, `results/model_comparison.png`
-and `results/activation_comparison.png`.
+It writes `results/results.json`, the source of every number in this README, and the figures in `results/figures/`.
 
 ### Tests
 
 ```powershell
-.\venv\Scripts\python.exe -m pytest tests/ -v
+./venv/Scripts/pytest -v
 ```
+
+The tests run without network on small fixtures: the mixed-encoding decoder, parsing (comma decimals, line breaks inside fields, missing values), the cap in force by creation date, the bunching estimator on a flat density and on a planted pile, sibling flags and chains, the within-buyer model on data with a known effect, history features that only look backwards, planted anomalies, the autoencoder, and a check that every number in both READMEs' tables matches `results/results.json`.
 
 ## License
 

@@ -1,0 +1,829 @@
+{
+  "data": {
+    "order_lines": 13742385,
+    "orders": 5006455,
+    "buyer_units": 6217,
+    "suppliers": 122356,
+    "orders_over_one_trillion_clp": 5
+  },
+  "compra_agil": {
+    "cap30": {
+      "orders": 686395,
+      "over_cap": 26,
+      "sensitivity": [
+        {
+          "fit_from": 0.5,
+          "window": 0.05,
+          "degree": 0,
+          "excess_mass": 1.2905942665829675
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.05,
+          "degree": 1,
+          "excess_mass": 1.3910075448287849
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.05,
+          "degree": 2,
+          "excess_mass": 0.7234461638282565
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.1,
+          "degree": 0,
+          "excess_mass": 0.8186058110303092
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.1,
+          "degree": 1,
+          "excess_mass": 1.2458871326769296
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.1,
+          "degree": 2,
+          "excess_mass": 0.6441083725258585
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.15,
+          "degree": 0,
+          "excess_mass": 0.523142936637389
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.15,
+          "degree": 1,
+          "excess_mass": 1.0422094034309544
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.15,
+          "degree": 2,
+          "excess_mass": 0.3818834909331191
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.05,
+          "degree": 0,
+          "excess_mass": 1.3693348278127782
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.05,
+          "degree": 1,
+          "excess_mass": 1.1490818054149248
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.05,
+          "degree": 2,
+          "excess_mass": 0.6977003864566759
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.1,
+          "degree": 0,
+          "excess_mass": 0.9147160671372069
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.1,
+          "degree": 1,
+          "excess_mass": 1.0297342409629624
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.1,
+          "degree": 2,
+          "excess_mass": 0.763391627213202
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.15,
+          "degree": 0,
+          "excess_mass": 0.6161593180749575
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.15,
+          "degree": 1,
+          "excess_mass": 0.8161353328698646
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.15,
+          "degree": 2,
+          "excess_mass": 0.6299237984582065
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.05,
+          "degree": 0,
+          "excess_mass": 1.3356305407683207
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.05,
+          "degree": 1,
+          "excess_mass": 1.0067443667827163
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.05,
+          "degree": 2,
+          "excess_mass": 0.5502482406754977
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.1,
+          "degree": 0,
+          "excess_mass": 0.9255559044329628
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.1,
+          "degree": 1,
+          "excess_mass": 1.0233951100214713
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.1,
+          "degree": 2,
+          "excess_mass": 0.6606181277739699
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.15,
+          "degree": 0,
+          "excess_mass": 0.630527926549349
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.15,
+          "degree": 1,
+          "excess_mass": 0.9401273730029401
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.15,
+          "degree": 2,
+          "excess_mass": 1.0160824629103768
+        }
+      ],
+      "bunching": {
+        "cap": 30.0,
+        "excess_mass": 1.0297342409629624,
+        "ci95": [
+          0.9949002669022153,
+          1.070510848014308
+        ],
+        "observed_in_window": 67458,
+        "expected_in_window": 33234.89284390061,
+        "orders_in_range": 173152
+      }
+    },
+    "cap100": {
+      "orders": 1278781,
+      "over_cap": 12,
+      "sensitivity": [
+        {
+          "fit_from": 0.5,
+          "window": 0.05,
+          "degree": 0,
+          "excess_mass": 0.9040040880388369
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.05,
+          "degree": 1,
+          "excess_mass": 1.378295657965646
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.05,
+          "degree": 2,
+          "excess_mass": 0.736854018177523
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.1,
+          "degree": 0,
+          "excess_mass": 0.4406280989026301
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.1,
+          "degree": 1,
+          "excess_mass": 0.9968397234330688
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.1,
+          "degree": 2,
+          "excess_mass": 0.39941805297399824
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.15,
+          "degree": 0,
+          "excess_mass": 0.26372091871172276
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.15,
+          "degree": 1,
+          "excess_mass": 0.9979316747186323
+        },
+        {
+          "fit_from": 0.5,
+          "window": 0.15,
+          "degree": 2,
+          "excess_mass": 0.34743027194983805
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.05,
+          "degree": 0,
+          "excess_mass": 1.046135380208386
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.05,
+          "degree": 1,
+          "excess_mass": 1.0904008568617742
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.05,
+          "degree": 2,
+          "excess_mass": 0.7762785038103673
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.1,
+          "degree": 0,
+          "excess_mass": 0.5661997932927041
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.1,
+          "degree": 1,
+          "excess_mass": 0.7148373722866255
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.1,
+          "degree": 2,
+          "excess_mass": 0.5055613872727308
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.15,
+          "degree": 0,
+          "excess_mass": 0.39192066765975353
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.15,
+          "degree": 1,
+          "excess_mass": 0.6718233545467744
+        },
+        {
+          "fit_from": 0.6,
+          "window": 0.15,
+          "degree": 2,
+          "excess_mass": 0.6414218767559258
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.05,
+          "degree": 0,
+          "excess_mass": 1.0993002332555823
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.05,
+          "degree": 1,
+          "excess_mass": 0.946435564685375
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.05,
+          "degree": 2,
+          "excess_mass": 0.6403493551347937
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.1,
+          "degree": 0,
+          "excess_mass": 0.6259133877203685
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.1,
+          "degree": 1,
+          "excess_mass": 0.6031887031061282
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.1,
+          "degree": 2,
+          "excess_mass": 0.30592681843279307
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.15,
+          "degree": 0,
+          "excess_mass": 0.468838170092704
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.15,
+          "degree": 1,
+          "excess_mass": 0.6290032333688047
+        },
+        {
+          "fit_from": 0.7,
+          "window": 0.15,
+          "degree": 2,
+          "excess_mass": -0.04782564953044766
+        }
+      ],
+      "bunching": {
+        "cap": 100.0,
+        "excess_mass": 0.7148373722866255,
+        "ci95": [
+          0.6797118078607421,
+          0.7524469831307351
+        ],
+        "observed_in_window": 43946,
+        "expected_in_window": 25626.91991101222,
+        "orders_in_range": 128123
+      }
+    }
+  },
+  "old_cap_30_after_change": {
+    "cap": 30.0,
+    "excess_mass": 0.1812560394609711,
+    "ci95": [
+      0.15483638659608773,
+      0.2064950481124045
+    ],
+    "observed_in_window": 32247,
+    "expected_in_window": 27298.908045976976,
+    "orders_in_range": 153872
+  },
+  "placebo_caps": {
+    "40": {
+      "cap": 40.0,
+      "excess_mass": 0.08859381905370073,
+      "ci95": [
+        0.06012931287827624,
+        0.11871307199590368
+      ],
+      "observed_in_window": 23283,
+      "expected_in_window": 21388.14275120502,
+      "orders_in_range": 134282
+    },
+    "50": {
+      "cap": 50.0,
+      "excess_mass": -0.06321885071940501,
+      "ci95": [
+        -0.08611831061005405,
+        -0.03900082567469613
+      ],
+      "observed_in_window": 21064,
+      "expected_in_window": 22485.507971820512,
+      "orders_in_range": 117149
+    },
+    "60": {
+      "cap": 60.0,
+      "excess_mass": 0.18674299999048963,
+      "ci95": [
+        0.15482721964938065,
+        0.22030867416874145
+      ],
+      "observed_in_window": 21928,
+      "expected_in_window": 18477.46310715608,
+      "orders_in_range": 110250
+    },
+    "70": {
+      "cap": 70.0,
+      "excess_mass": 0.2260567198280651,
+      "ci95": [
+        0.19522562022289078,
+        0.2623820114484726
+      ],
+      "observed_in_window": 21106,
+      "expected_in_window": 17214.538005190967,
+      "orders_in_range": 105437
+    },
+    "80": {
+      "cap": 80.0,
+      "excess_mass": 0.06125604626506923,
+      "ci95": [
+        0.03332964054662311,
+        0.08982607780923252
+      ],
+      "observed_in_window": 20702,
+      "expected_in_window": 19507.07378568779,
+      "orders_in_range": 103204
+    },
+    "90": {
+      "cap": 90.0,
+      "excess_mass": 0.30130975315502617,
+      "ci95": [
+        0.2672601768108381,
+        0.3350984604739638
+      ],
+      "observed_in_window": 25029,
+      "expected_in_window": 19233.69892473116,
+      "orders_in_range": 106103
+    }
+  },
+  "splitting": {
+    "cap30": {
+      "sibling_rate": 0.28008607677558844,
+      "within_buyer": {
+        "outcome": "has_sibling",
+        "effect": 0.02621592791004915,
+        "ci95": [
+          0.016843752043731744,
+          0.03558810377636656
+        ],
+        "p_value": 4.195289931066221e-08,
+        "rate_reference": 0.31924620108498386,
+        "rate_near_cap": 0.4276876546604344,
+        "orders": 145581,
+        "buyers": 2791
+      },
+      "within_buyer_same_day": {
+        "outcome": "same_day_sibling",
+        "effect": 0.01058998310457463,
+        "ci95": [
+          0.0013575020991842233,
+          0.019822464109965035
+        ],
+        "p_value": 0.024566741945470663,
+        "rate_reference": 0.1750394851722142,
+        "rate_near_cap": 0.23753551461827513,
+        "orders": 145581,
+        "buyers": 2791
+      },
+      "chains": {
+        "chains_over_cap": 28040,
+        "orders_in_them": 109924,
+        "share_of_orders": 0.16015408733558287,
+        "utm_in_them": 1921660.6572595017,
+        "share_of_amount": 0.2454968805895728,
+        "median_orders_per_chain": 3.0
+      },
+      "by_size": [
+        {
+          "size_bin": 0.0,
+          "orders": 54038,
+          "sibling_rate": 0.30946741182131093,
+          "same_day_rate": 0.14106739701691404
+        },
+        {
+          "size_bin": 0.05,
+          "orders": 80431,
+          "sibling_rate": 0.2660044012880606,
+          "same_day_rate": 0.11297882657184419
+        },
+        {
+          "size_bin": 0.1,
+          "orders": 71764,
+          "sibling_rate": 0.24930327183546067,
+          "same_day_rate": 0.10077476171896772
+        },
+        {
+          "size_bin": 0.15,
+          "orders": 60075,
+          "sibling_rate": 0.2421972534332085,
+          "same_day_rate": 0.09634623387432376
+        },
+        {
+          "size_bin": 0.2,
+          "orders": 50035,
+          "sibling_rate": 0.2363145797941441,
+          "same_day_rate": 0.095513140801439
+        },
+        {
+          "size_bin": 0.25,
+          "orders": 40793,
+          "sibling_rate": 0.24035986566322654,
+          "same_day_rate": 0.09994361777755988
+        },
+        {
+          "size_bin": 0.3,
+          "orders": 33453,
+          "sibling_rate": 0.2405763309718112,
+          "same_day_rate": 0.09945296385974352
+        },
+        {
+          "size_bin": 0.35,
+          "orders": 29454,
+          "sibling_rate": 0.24146126162830175,
+          "same_day_rate": 0.10052963943776737
+        },
+        {
+          "size_bin": 0.4,
+          "orders": 25857,
+          "sibling_rate": 0.24372510345361023,
+          "same_day_rate": 0.1066248984801021
+        },
+        {
+          "size_bin": 0.45,
+          "orders": 24633,
+          "sibling_rate": 0.2525879917184265,
+          "same_day_rate": 0.1137092518166687
+        },
+        {
+          "size_bin": 0.5,
+          "orders": 23516,
+          "sibling_rate": 0.2717724102738561,
+          "same_day_rate": 0.13586494301751997
+        },
+        {
+          "size_bin": 0.55,
+          "orders": 19163,
+          "sibling_rate": 0.27521786776600743,
+          "same_day_rate": 0.1358346814173146
+        },
+        {
+          "size_bin": 0.6,
+          "orders": 18617,
+          "sibling_rate": 0.26615458989095986,
+          "same_day_rate": 0.13315786646613312
+        },
+        {
+          "size_bin": 0.65,
+          "orders": 17011,
+          "sibling_rate": 0.2865204867438716,
+          "same_day_rate": 0.14414202574804538
+        },
+        {
+          "size_bin": 0.7,
+          "orders": 17802,
+          "sibling_rate": 0.3053027749691046,
+          "same_day_rate": 0.163914166947534
+        },
+        {
+          "size_bin": 0.75,
+          "orders": 17804,
+          "sibling_rate": 0.29959559649516965,
+          "same_day_rate": 0.16254774208043135
+        },
+        {
+          "size_bin": 0.8,
+          "orders": 16674,
+          "sibling_rate": 0.33939066810603336,
+          "same_day_rate": 0.19539402662828356
+        },
+        {
+          "size_bin": 0.85,
+          "orders": 17786,
+          "sibling_rate": 0.369054312380524,
+          "same_day_rate": 0.22410884965703362
+        },
+        {
+          "size_bin": 0.9,
+          "orders": 23671,
+          "sibling_rate": 0.3888724599721178,
+          "same_day_rate": 0.22943686367284863
+        },
+        {
+          "size_bin": 0.95,
+          "orders": 43787,
+          "sibling_rate": 0.4265649622033937,
+          "same_day_rate": 0.23687395802407107
+        }
+      ]
+    },
+    "cap100": {
+      "sibling_rate": 0.2328939064417214,
+      "within_buyer": {
+        "outcome": "has_sibling",
+        "effect": 0.016897881000433324,
+        "ci95": [
+          0.005950722406937664,
+          0.027845039593928984
+        ],
+        "p_value": 0.002483266588253514,
+        "rate_reference": 0.28690116665204696,
+        "rate_near_cap": 0.348270603729119,
+        "orders": 108655,
+        "buyers": 2438
+      },
+      "within_buyer_same_day": {
+        "outcome": "same_day_sibling",
+        "effect": 0.00245772798076078,
+        "ci95": [
+          -0.005239181884030341,
+          0.010154637845551902
+        ],
+        "p_value": 0.531417825161542,
+        "rate_reference": 0.14498565180887457,
+        "rate_near_cap": 0.17449920288348236,
+        "orders": 108655,
+        "buyers": 2438
+      },
+      "chains": {
+        "chains_over_cap": 20020,
+        "orders_in_them": 89488,
+        "share_of_orders": 0.06998297504283611,
+        "utm_in_them": 4116370.6053348915,
+        "share_of_amount": 0.15652594293501407,
+        "median_orders_per_chain": 3.0
+      },
+      "by_size": [
+        {
+          "size_bin": 0.0,
+          "orders": 388970,
+          "sibling_rate": 0.24813738848754402,
+          "same_day_rate": 0.10230609044399311
+        },
+        {
+          "size_bin": 0.05,
+          "orders": 251478,
+          "sibling_rate": 0.21361709573004398,
+          "same_day_rate": 0.08138684099603147
+        },
+        {
+          "size_bin": 0.1,
+          "orders": 144124,
+          "sibling_rate": 0.20832755127529073,
+          "same_day_rate": 0.08134661818989204
+        },
+        {
+          "size_bin": 0.15,
+          "orders": 88319,
+          "sibling_rate": 0.20724872337775563,
+          "same_day_rate": 0.0809338873855003
+        },
+        {
+          "size_bin": 0.2,
+          "orders": 67960,
+          "sibling_rate": 0.20974102413184226,
+          "same_day_rate": 0.08324014125956444
+        },
+        {
+          "size_bin": 0.25,
+          "orders": 54750,
+          "sibling_rate": 0.2120365296803653,
+          "same_day_rate": 0.08533333333333333
+        },
+        {
+          "size_bin": 0.3,
+          "orders": 37743,
+          "sibling_rate": 0.21974935749675437,
+          "same_day_rate": 0.08854622049121691
+        },
+        {
+          "size_bin": 0.35,
+          "orders": 30277,
+          "sibling_rate": 0.22465898206559434,
+          "same_day_rate": 0.09363543283680682
+        },
+        {
+          "size_bin": 0.4,
+          "orders": 28065,
+          "sibling_rate": 0.21254231248886513,
+          "same_day_rate": 0.09192944949225014
+        },
+        {
+          "size_bin": 0.45,
+          "orders": 21060,
+          "sibling_rate": 0.2326210826210826,
+          "same_day_rate": 0.10365622032288699
+        },
+        {
+          "size_bin": 0.5,
+          "orders": 19599,
+          "sibling_rate": 0.23970610745446197,
+          "same_day_rate": 0.10755650798510127
+        },
+        {
+          "size_bin": 0.55,
+          "orders": 18243,
+          "sibling_rate": 0.23926985693142575,
+          "same_day_rate": 0.11144000438524365
+        },
+        {
+          "size_bin": 0.6,
+          "orders": 14924,
+          "sibling_rate": 0.25388635754489414,
+          "same_day_rate": 0.12168319485392656
+        },
+        {
+          "size_bin": 0.65,
+          "orders": 15196,
+          "sibling_rate": 0.25763358778625955,
+          "same_day_rate": 0.125690971308239
+        },
+        {
+          "size_bin": 0.7,
+          "orders": 14028,
+          "sibling_rate": 0.2585543199315654,
+          "same_day_rate": 0.12581978899344168
+        },
+        {
+          "size_bin": 0.75,
+          "orders": 12639,
+          "sibling_rate": 0.2983622122003323,
+          "same_day_rate": 0.1569744441807105
+        },
+        {
+          "size_bin": 0.8,
+          "orders": 13029,
+          "sibling_rate": 0.29349911735359585,
+          "same_day_rate": 0.15258270013047817
+        },
+        {
+          "size_bin": 0.85,
+          "orders": 14361,
+          "sibling_rate": 0.30255553234454424,
+          "same_day_rate": 0.15827588608035653
+        },
+        {
+          "size_bin": 0.9,
+          "orders": 14966,
+          "sibling_rate": 0.3357610583990378,
+          "same_day_rate": 0.17827074702659362
+        },
+        {
+          "size_bin": 0.95,
+          "orders": 28980,
+          "sibling_rate": 0.3469634230503796,
+          "same_day_rate": 0.17374051069703245
+        }
+      ]
+    }
+  },
+  "detectors": {
+    "coverage": {
+      "train": 0.929881337155935,
+      "test": 0.9194479894880837
+    },
+    "train_lines": 400000,
+    "test_lines": 200000,
+    "planted": 10000,
+    "recall_at_5pct": {
+      "Rule (z-scores)": {
+        "overall": 0.1743,
+        "precision": 0.1743,
+        "overpricing": 0.059,
+        "inflated_quantity": 0.2355,
+        "digit_error": 0.386,
+        "new_supplier": 0.0455,
+        "wrong_product": 0.1455
+      },
+      "Isolation Forest": {
+        "overall": 0.3881,
+        "precision": 0.3881,
+        "overpricing": 0.07,
+        "inflated_quantity": 0.1205,
+        "digit_error": 0.7015,
+        "new_supplier": 0.6995,
+        "wrong_product": 0.349
+      },
+      "Autoencoder (ReLU)": {
+        "overall": 0.224,
+        "precision": 0.224,
+        "overpricing": 0.1005,
+        "inflated_quantity": 0.145,
+        "digit_error": 0.4625,
+        "new_supplier": 0.1665,
+        "wrong_product": 0.2455
+      },
+      "Autoencoder (GELU)": {
+        "overall": 0.2287,
+        "precision": 0.2287,
+        "overpricing": 0.099,
+        "inflated_quantity": 0.1155,
+        "digit_error": 0.516,
+        "new_supplier": 0.1515,
+        "wrong_product": 0.2615
+      },
+      "Autoencoder (Swish (SiLU))": {
+        "overall": 0.2237,
+        "precision": 0.2237,
+        "overpricing": 0.106,
+        "inflated_quantity": 0.123,
+        "digit_error": 0.452,
+        "new_supplier": 0.16,
+        "wrong_product": 0.2775
+      }
+    },
+    "autoencoder_best_epoch": {
+      "ReLU": 148,
+      "GELU": 148,
+      "Swish (SiLU)": 148
+    }
+  }
+}

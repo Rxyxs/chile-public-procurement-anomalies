@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public Procurement Anomaly Engine (Chile)</title>
+<meta name="description" content="On 13.7 million real purchase-order lines from Mercado Público, Compra Ágil orders pile up just under the legal cap, twice the trend under the old 30 UTM cap and 71% above it under">
+<style>
+  :root { --bg:#FBFAF8; --surface:#FFF; --ink:#23201D; --muted:#6B645D; --line:#E3DED7; --accent:#B5553D; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#171614; --surface:#201E1B; --ink:#EDE9E3; --muted:#A9A29A; --line:#322E2A; --accent:#D9765C; } }
+  :root[data-theme="dark"] { --bg:#171614; --surface:#201E1B; --ink:#EDE9E3; --muted:#A9A29A; --line:#322E2A; --accent:#D9765C; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:900px; margin:0 auto; padding:0 16px 88px; }
+  header { padding:60px 0 32px; border-bottom:1px solid var(--line); margin-bottom:36px; }
+  h1 { font-size:clamp(1.7rem,5vw,2.4rem); line-height:1.16; margin:0 0 18px; letter-spacing:-.02em; }
+  .lede { font-size:clamp(1rem,2.3vw,1.1rem); color:var(--muted); margin:0 0 22px; max-width:62ch; }
+  .lede strong { color:var(--ink); }
+  .links a { display:inline-block; margin:0 9px 9px 0; padding:9px 15px; border:1px solid var(--line);
+    border-radius:7px; text-decoration:none; color:var(--ink); background:var(--surface); font-size:.9rem;
+    transition:border-color .15s; }
+  .links a:hover { border-color:var(--accent); }
+  h2 { font-size:1.3rem; margin:48px 0 8px; padding-top:12px; border-top:1px solid var(--line); letter-spacing:-.01em; }
+  figure { margin:22px 0; }
+  figure img { width:100%; height:auto; display:block; border:1px solid var(--line); border-radius:9px; background:#fff; }
+  figcaption { font-size:.85rem; color:var(--muted); margin-top:9px; max-width:70ch; }
+  p { margin:0 0 16px; max-width:70ch; }
+  code { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:.86em;
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+  footer { margin-top:60px; padding-top:22px; border-top:1px solid var(--line); font-size:.86rem; color:var(--muted); }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Public Procurement Anomaly Engine (Chile)</h1>
+<p class="lede">On 13.7 million real purchase-order lines from Mercado Público, Compra Ágil orders pile up just under the legal cap, twice the trend under the old 30 UTM cap and 71% above it under the new 100 UTM one, and the pile moved when Ley 21.634 moved the cap; but within the same buyer, orders at the cap come with a same-supplier order within a week only 2 points more often, so most of the pile looks like purchases sized to the limit rather than split under it.</p>
+<div class="links">
+<a href="https://github.com/Rxyxs/mining-procurement-anomaly-engine">Code and method</a>
+<a href="https://github.com/Rxyxs/mining-procurement-anomaly-engine#readme">Full README</a>
+</div></header>
+<p>This page shows the project's results. The methodology, the design decisions and the limitations are documented in the repository's README.</p>
+<h2>1. The pile under the cap</h2>
+<figure>
+<img src="figures/bunching_compra_agil.png" alt="Compra Ágil orders by amount" loading="lazy">
+<figcaption>Compra Ágil orders by total amount: under either rule, the density is flat between 60% and 90% of the cap and climbs sharply in the last 10% below it, which is where the excess is measured against a straight line fitted on the flat part.</figcaption>
+</figure>
+<figure>
+<img src="figures/placebo_caps.png" alt="Excess mass at real and fake caps" loading="lazy">
+<figcaption>The same measure at amounts that never were a cap stays between -6% and +30%; under the real caps it is 103% and 71%, and at 30 UTM it fell to 18% as soon as the cap moved away from it.</figcaption>
+</figure>
+<h2>2. Split purchases or purchases sized to the cap?</h2>
+<figure>
+<img src="figures/sibling_rates.png" alt="Orders with a sibling by size" loading="lazy">
+<figcaption>The share of orders with a same-buyer, same-supplier order within 7 days rises near the cap under both rules, from about 21% to 34% after the change.</figcaption>
+</figure>
+<h2>3. Detectors on real order lines</h2>
+<figure>
+<img src="figures/detector_recall.png" alt="Planted anomalies found by each detector" loading="lazy">
+</figure>
+<figure>
+<img src="figures/training_curves.png" alt="Autoencoder training curves" loading="lazy">
+<figcaption>Reconstruction error on 2025 lines for the three activations; the validation curve tracks the training one, without overfitting.</figcaption>
+</figure>
+<footer>
+Pablo Reyes · <a href="https://github.com/Rxyxs/mining-procurement-anomaly-engine">github.com/Rxyxs/mining-procurement-anomaly-engine</a> · MIT<br><br>
+Every figure on this page is produced by the repository's pipeline. For the full method and its limitations, see the README.
+</footer>
+</div></body></html>
