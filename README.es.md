@@ -1,4 +1,4 @@
-**[English](README.md) | [Español](README.es.md)**
+[[English](README.md) ] | [Español ]
 
 # Public Procurement Anomaly Engine (Chile)
 
